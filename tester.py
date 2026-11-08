@@ -62,7 +62,7 @@ def run_single_case(case: dict, base_url: str = "") -> dict:
         url = base_url.rstrip("/") + "/" + url.lstrip("/")
     
     method = case.get("method", "GET").upper()
-    headers = case.get("headers", {})
+    headers = case.get("headers") or {}
     body = case.get("body")
     
     result = {
@@ -87,6 +87,10 @@ def run_single_case(case: dict, base_url: str = "") -> dict:
         result["response_preview"] = resp.text[:500]
         
         expected_status = case.get("expected_status", 200)
+        try:
+            expected_status = int(expected_status)
+        except (TypeError, ValueError):
+            expected_status = 200
         expected_contains = case.get("expected_contains", "")
         
         status_ok = resp.status_code == expected_status

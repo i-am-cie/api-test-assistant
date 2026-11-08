@@ -5,7 +5,6 @@ api-test-assistant Web UI (Flask)
 
 from flask import Flask, render_template_string, request, jsonify
 from tester import generate_test_cases, run_single_case, analyze_results
-import json
 
 app = Flask(__name__)
 
@@ -246,7 +245,7 @@ def index():
 
 @app.route('/api/generate', methods=['POST'])
 def api_generate():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     desc = data.get('desc', '')
     cases = generate_test_cases(desc)
     return jsonify({"cases": cases})
@@ -254,7 +253,7 @@ def api_generate():
 
 @app.route('/api/run', methods=['POST'])
 def api_run():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     cases = data.get('cases', [])
     base_url = data.get('base_url', '')
     
