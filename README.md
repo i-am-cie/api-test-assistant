@@ -6,6 +6,7 @@ A local web tool that generates API test cases from a plain-language endpoint de
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![LLM](https://img.shields.io/badge/LLM-Ollama-black)
 ![Offline](https://img.shields.io/badge/Offline-100%25-success)
+![Tests](https://img.shields.io/badge/tests-16%20passed-success)
 
 ## What it does
 
@@ -37,6 +38,15 @@ python app.py
 ```
 
 Then open <http://localhost:5002> in your browser. The Flask development server listens on port `5002`.
+
+## Run tests
+
+The repository ships with a pytest suite under `tests/` that covers case JSON parsing, URL joining, request construction, pass/fail judgment, error classification and result counting. Both the Ollama call and the HTTP request are mocked, so the suite does **not** require Ollama, a live API, or the `ollama`/`requests` packages to be installed.
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests/ -v
+```
 
 ## Usage
 
@@ -73,6 +83,8 @@ There is no configuration file; settings live in the source or are entered in th
 4. For each case, `run_single_case` joins the URL with the base URL, sends the request with `requests` (JSON body for POST/PUT/PATCH), and marks the case passed when the status code equals `expected_status` and `expected_contains` appears in the response text.
 5. `analyze_results` sends the result list to the model and returns a short Chinese summary.
 
+The repository's own pytest suite covers only this parsing/execution/analysis code; it does **not** hit a real API or validate the model's generated cases.
+
 ## Limitations
 
 - **Generation quality depends on the model.** Cases may use wrong paths, wrong methods or unrealistic payloads; expect to edit or regenerate them.
@@ -89,4 +101,4 @@ MIT © 2026 i-am-cie — see [LICENSE](LICENSE).
 
 ## 中文说明
 
-这是一个本地 AI API 测试助手：用自然语言描述接口后，通过本机 Ollama 大模型生成 JSON 格式的测试用例（覆盖正常、缺失参数、非法格式、权限、边界等场景），再在网页里设置 Base URL 一键批量发送请求，得到通过/失败统计和 AI 分析总结。所有数据都在本机，无需 API Key。使用前先安装 Ollama 并拉取 `qwen2.5:7b`，然后 `pip install -r requirements.txt`、`python app.py`，浏览器打开 http://localhost:5002。注意：生成用例可能不准确，断言只比较状态码和关键字，且只会执行你指定的目标接口，请勿对未授权系统发起测试。
+这是一个本地 AI API 测试助手：用自然语言描述接口后，通过本机 Ollama 大模型生成 JSON 格式的测试用例（覆盖正常、缺失参数、非法格式、权限、边界等场景），再在网页里设置 Base URL 一键批量发送请求，得到通过/失败统计和 AI 分析总结。所有数据都在本机，无需 API Key。使用前先安装 Ollama 并拉取 `qwen2.5:7b`，然后 `pip install -r requirements.txt`、`python app.py`，浏览器打开 http://localhost:5002。仓库自带 pytest 单元测试（`tests/` 目录），覆盖用例解析、URL 拼接、请求构造、通过/失败判定、异常分类和结果统计，模型调用与 HTTP 请求均已打桩，运行测试无需启动 Ollama 或真实接口：`pip install -r requirements-dev.txt` 后 `python -m pytest tests/ -v`。注意：生成用例可能不准确，断言只比较状态码和关键字，且只会执行你指定的目标接口，请勿对未授权系统发起测试。
